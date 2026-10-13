@@ -28,8 +28,7 @@ public class DinheiroService {
         }
 
         DinheiroDado salva = new DinheiroDado();
-
-        salva.setSalario(dinheiroRequest.getSalario());
+        salva.setSalario(resultado);
         salva.setGasto(dinheiroRequest.getGasto());
         salva.setMinimo(dinheiroRequest.getMinimo());
 
@@ -46,30 +45,19 @@ public class DinheiroService {
 
     }
 
-    public DinheiroResponse dinheiro(BigDecimal salario) {
-        DinheiroDado salvo = repository.findBySalario(salario)
-                .orElseThrow(() -> new BuscasException("Salario não encontrado"));
+    public DinheiroResponse dinheiro(Long id) {
+        DinheiroDado salvo = repository.findById(id)
+                .orElseThrow(() -> new BuscasException("Informação não encontrada"));
 
         return new DinheiroResponse(salvo.getSalario(), salvo.getGasto(), salvo.getMinimo());
     }
 
     @Transactional
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new BuscasException("Informação não encontrada");
+        }
         repository.deleteById(id);
-    }
-
-    @Transactional
-    public DinheiroResponse atualizar(Long id, DinheiroRequest request) {
-        DinheiroDado salva = repository.findById(id)
-                .orElseThrow(() -> new BuscasException("Pedido não encontrado"));
-
-        salva.setSalario(request.getSalario());
-        salva.setGasto(request.getGasto());
-        salva.setMinimo(request.getMinimo());
-
-        DinheiroDado salvo = repository.save(salva);
-
-        return new DinheiroResponse(salvo.getSalario(), salvo.getGasto(), salvo.getMinimo());
     }
 
 }
